@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useDayGate } from "../useDayGate";
 
 export default function Home() {
   const [d, setD] = useState(null);
   const [err, setErr] = useState("");
+  const { sealed, 状态 } = useDayGate();
 
   useEffect(() => {
     api
@@ -19,7 +21,6 @@ export default function Home() {
         ["超期隔离", d.超期隔离],
         ["今日已取", d.已取],
         ["水洗中", d.水洗],
-        ["日闸", d.日闸],
       ]
     : [];
 
@@ -39,8 +40,17 @@ export default function Home() {
               <span>{k}</span>
             </div>
           ))}
+          <div className="metric">
+            <b className={sealed ? "gate-sealed" : "gate-open"}>{状态}</b>
+            <span>日闸</span>
+          </div>
         </div>
       </div>
+      {sealed && (
+        <div className="gate-frozen">
+          今日已结案：全日写冻结，开票 / 推进 / 取衣 / 人工隔离均不可写；本页与各列表为只读。
+        </div>
+      )}
       <div className="msg">{err}</div>
       {d && (
         <section className="panel">

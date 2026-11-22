@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useDayGate } from "../useDayGate";
 
 const NEXT = {
   已收: ["水洗", "烘干", "熨烫", "待取"],
@@ -9,6 +10,7 @@ const NEXT = {
 };
 
 export default function Process() {
+  const { sealed } = useDayGate();
   const [rows, setRows] = useState([]);
   const [msg, setMsg] = useState("");
 
@@ -35,6 +37,9 @@ export default function Process() {
   return (
     <section className="panel">
       <h3>工序轨</h3>
+      {sealed && (
+        <div className="gate-frozen">今日已结案，禁止改工序（全日写冻结）；列表只读。</div>
+      )}
       <p className={`msg ${msg.includes("→") ? "ok" : ""}`}>{msg}</p>
       <table>
         <thead>
@@ -60,7 +65,13 @@ export default function Process() {
               <td>
                 <div className="row">
                   {(NEXT[r.status] || []).map((s) => (
-                    <button key={s} type="button" className="ghost" onClick={() => go(r.ticket_no, s)}>
+                    <button
+                      key={s}
+                      type="button"
+                      className="ghost"
+                      disabled={sealed}
+                      onClick={() => go(r.ticket_no, s)}
+                    >
                       {s}
                     </button>
                   ))}

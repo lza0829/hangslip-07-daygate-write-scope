@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useDayGate } from "../useDayGate";
 
 export default function Quarantine() {
+  const { sealed } = useDayGate();
   const [ready, setReady] = useState([]);
   const [logs, setLogs] = useState([]);
   const [msg, setMsg] = useState("");
@@ -38,6 +40,9 @@ export default function Quarantine() {
     <>
       <section className="panel">
         <h3>待取转隔离</h3>
+        {sealed && (
+          <div className="gate-frozen">今日已结案，禁止人工隔离（全日写冻结）；隔离流水只读。</div>
+        )}
         <p className="msg">{msg}</p>
         <table>
           <thead>
@@ -56,12 +61,13 @@ export default function Quarantine() {
                 <td>{r.customer_name}</td>
                 <td>
                   <div className="row">
-                    <button type="button" onClick={() => iso(r.ticket_no, "超期隔离")}>
+                    <button type="button" disabled={sealed} onClick={() => iso(r.ticket_no, "超期隔离")}>
                       超期隔离
                     </button>
                     <button
                       type="button"
                       className="ghost"
+                      disabled={sealed}
                       onClick={() => iso(r.ticket_no, "丢失隔离")}
                     >
                       丢失隔离

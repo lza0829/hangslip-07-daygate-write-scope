@@ -42,6 +42,8 @@ export const api = {
   隔离列表: () => req("/隔离"),
   日闸今日: () => req("/日闸/今日"),
   日闸列表: () => req("/日闸"),
+  日闸流水: (day = "") => req(`/日闸/流水${day ? `?day=${encodeURIComponent(day)}` : ""}`),
   结案: (body) => req("/日闸/结案", { method: "POST", body: JSON.stringify(body) }),
+  解冻: (body) => req("/日闸/解冻", { method: "POST", body: JSON.stringify(body) }),
   设置: () => req("/设置"),
 };

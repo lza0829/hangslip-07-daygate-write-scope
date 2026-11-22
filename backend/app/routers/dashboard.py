@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from app.db import connect
-from app.services.gate import today_str
+from app.services.gate import gate_snapshot, today_str
 
 router = APIRouter(tags=["总览"])
 
@@ -18,13 +18,15 @@ def dashboard():
             ).fetchone()["c"]
 
         day = today_str()
-        gate = conn.execute("SELECT * FROM day_gates WHERE day=?", (day,)).fetchone()
+        # 日闸徽章与状态页、写闸同源，解冻后不会假绿
+        gate = gate_snapshot(day, conn=conn)
         wm = conn.execute(
             "SELECT value FROM watermarks WHERE key='在途票'"
         ).fetchone()
         return {
             "今日": day,
-            "日闸": "已结案" if gate and gate["sealed"] else "开放",
+            "日闸": gate["状态"],
+            "日闸sealed": gate["sealed"],
             "在途水位": wm["value"] if wm else 0,
             "已收": cnt("已收"),
             "水洗": cnt("水洗"),

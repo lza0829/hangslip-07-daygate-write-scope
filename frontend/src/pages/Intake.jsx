@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useDayGate } from "../useDayGate";
 
 export default function Intake() {
+  const { sealed } = useDayGate();
   const [stores, setStores] = useState([]);
   const [msg, setMsg] = useState("");
   const [form, setForm] = useState({
@@ -45,8 +47,12 @@ export default function Intake() {
   return (
     <section className="panel">
       <h3>收衣开票</h3>
+      {sealed && (
+        <div className="gate-frozen">今日已结案，禁止新开挂牌（全日写冻结）。</div>
+      )}
       <p className="msg">{msg}</p>
       <form onSubmit={submit}>
+        <fieldset disabled={sealed} style={{ border: "none", padding: 0, margin: 0 }}>
         <div className="row">
           <input
             placeholder="票号"
@@ -101,6 +107,7 @@ export default function Intake() {
           />
           <button type="submit">开票贴号</button>
         </div>
+        </fieldset>
       </form>
     </section>
   );

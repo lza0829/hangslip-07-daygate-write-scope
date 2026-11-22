@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useDayGate } from "../useDayGate";
 
 export default function Ready() {
+  const { sealed } = useDayGate();
   const [rows, setRows] = useState([]);
   const [codes, setCodes] = useState({});
   const [msg, setMsg] = useState("");
@@ -31,6 +33,9 @@ export default function Ready() {
   return (
     <section className="panel">
       <h3>待取核销</h3>
+      {sealed && (
+        <div className="gate-frozen">今日已结案，禁止取衣核销（全日写冻结）；列表只读。</div>
+      )}
       <p className={`msg ${msg.includes("已取") ? "ok" : ""}`}>{msg}</p>
       <table>
         <thead>
@@ -58,7 +63,7 @@ export default function Ready() {
                 />
               </td>
               <td>
-                <button type="button" onClick={() => pick(r.ticket_no)}>
+                <button type="button" disabled={sealed} onClick={() => pick(r.ticket_no)}>
                   核销取衣
                 </button>
               </td>
